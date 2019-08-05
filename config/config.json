@@ -5,12 +5,10 @@
   },
   "test": {
     "dialect": "sqlite",
-    "storage": "library.db",
-    "operatorsAliases":false
+    "storage": "library.db"
   },
   "production": {
     "dialect": "sqlite",
-    "storage": "library.db",
-    "operatorsAliases":false
+    "storage": "library.db"
   }
 }

@@ -12,7 +12,9 @@ router.get('/', function(req, res, next) {
   .then( books =>{
     res.render('index',{ title: 'SQL-Library-Manager', books })
   })
-  
+  .catch((error)=>{
+    res.send(500);
+    })
   });
 
 
@@ -26,8 +28,19 @@ router.post('/new', (req, res, next) =>{
   // console.log(req.body);
   Books.create(req.body).then(function() {
     res.redirect("/");
+  })
+  .catch((err)=>{
+    if(err.name === "SequelizeValidationError"){
+      // Render the same form and pass the error as a parameter
+      res.render('new-book', {error:err.errors});
+    } else {
+      throw err;
+    }
+  })
+  .catch((err)=>{
+    res.send(500);
   });
-
+  
 });
 
 // - display a book details in the form based on the ID catch from the url.
@@ -39,31 +52,60 @@ router.get('/:id', (req, res, next)=>{
     raw: true,
   }).then((book) => {
     // console.log(book[0]);
+    if(book){
     res.render('update-book',{book:book[0], pageTitle:"Update Book"});
+    } else{
+      res.send(404);
+    }
   })
+  .catch((error)=>{
+    res.send(500);
+  });
 });
 
 //- Updates book info in the database.
 router.post('/:id', function(req, res, next){
   Books.findByPk(req.params.id)
   .then(function(book) {
+    if(book){
     return book.update(req.body);
+    } else{
+      res.send(404);
+    }
   })
   .then(function(){
     res.redirect("/");    
+  })
+  .catch((err)=>{
+    if(err.name === "SequelizeValidationError"){
+           // Render the same form and pass the error as a parameter
+           console.log(err);
+           res.render('update-book', {error:err.errors});
+    } else {
+      throw err;
+    }
+  })
+  .catch((err)=>{
+    res.send(404)
   });
 });
 
 
 //- Deletes a book. Careful, this can’t be undone. It can be helpful to create a new “test” book to test deleting.
-router.delete('/:id/delete', (req, res, next) =>{
+
+router.post('/:id/delete', (req, res, next)=>{
   Books.findByPk(req.params.id)
-  .then((book)=>{
-    book.destroy();
-  })
-  .then(()=>{
-    res.redirect('/');
-  })
-});
+    .then((book)=>{
+      if(book){
+        book.destroy();
+      }
+      const error = new Error('Server Error.');
+      error.status = 500;
+      return next(error);
+    })
+    .then(()=>{ //redirect to the main page
+      res.redirect('/')
+    })
+})
 
 module.exports = router;

@@ -32,11 +32,19 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
+// render an error page based on error status
+  if(err.status === 404){
+    res.render('page-not-found')
+  } else{
   res.status(err.status || 500);
   // render the error page
- 
-    res.render('page-not-found')
+    res.render('error');
+  }
  
 });
 
 module.exports = app;
+
+app.listen(3000, ()=>{
+  console.log('this app is running on localhost:3000');
+})
