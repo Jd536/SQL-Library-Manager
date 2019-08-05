@@ -2,12 +2,6 @@ extends layout
 
 block content
     h1=pageTitle
-    form(method='post')
-        if errors
-            h2.error Opps!
-            ul.error
-                each error in errors
-                    li= error.message
         p
         label(for='title') Title
         input#title(name='title', type='text' value=book.title)

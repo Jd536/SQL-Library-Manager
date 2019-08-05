@@ -23,17 +23,25 @@ router.get('/new', (req, res, next) =>{
   res.render('new-book', {pageTitle:'New Book'});
 });
 
-// - Posts a new book to the database.
+
+// - POST A NEW BOOK TO THE DATABASE
+
 router.post('/new', (req, res, next) =>{
-  // console.log(req.body);
-  Books.create(req.body).then(function() {
+  Books.create(req.body) 
+  .then(function() {
     res.redirect("/");
   })
   .catch((err)=>{
-    if(err.name === "SequelizeValidationError"){
+    if(err.name === "SequelizeValidationError"){ // RENDER THE FORM PAGE WITH AN ERROR MESSAGE IF THE ERROR CATCHED IS EQUAL TO "SequelizeValidationError"
       // Render the same form and pass the error as a parameter
-      res.render('new-book', {error:err.errors});
-    } else {
+      // res.json(err);
+      res.render('new-book',
+       {
+        book:Books.build(req.body),
+        pageTitle:"New Book",
+        errors:err.errors
+      });
+    } else {// IF THE ERROR CATCH IS NOT EQUAL TO "SequelizeValidationError" THE FUNCTION WILL JUST THROW AN ERROR THAT THE NEXT CATCH FUNCTION WILL CATCH
       throw err
     }
   })
@@ -43,61 +51,49 @@ router.post('/new', (req, res, next) =>{
   
 });
 
-// - display a book details in the form based on the ID catch from the url.
+// - DISPLAYS A BOOK DETAILS IN THE FORM BASED ON THE ID CATCH FROM THE URL
 router.get('/:id', (req, res, next)=>{
   Books.findAll({
     where: {
       id: req.params.id
     },
     raw: true,
-  }).then((book) => {
-    // console.log(book[0]);
-    if(book){
-    res.render('update-book',{book:book[0], pageTitle:"Update Book"});
-    } else{
-      res.send(404);
-    }
   })
-  .catch((error)=>{
-    res.send(500);
+  .then((book) => {
+    if(book.length!==0){
+      res.render('update-book',{book:book[0], pageTitle:"Update Book"});
+      } else if(book.length==0){
+      res.render('page-not-found')
+      }
   });
+
 });
 
-//- Updates book info in the database.
+//- UPDATES THE SELECTED BOOK ROW FROM THE BOOKS DATABASE
 router.post('/:id', function(req, res, next){
   Books.findByPk(req.params.id)
   .then(function(book) {
-    if(book){
-    return book.update(req.body);
-    } else{
-      res.send(404);
-    }
-  }) .catch((err)=>{
-    if(err.name === "SequelizeValidationError"){
-           // Render the same form and pass the error as a parameter
-           console.log(err);
-           res.render('update-book', {error:err.errors});
-    } else {
-      throw err;
-    }
+      return book.update(req.body);
   })
+
   .then(function(){
     res.redirect("/");    
   })
-  .catch((err)=>{
-    res.send(404)
-  });
 });
 
 
 //- Deletes a book. Careful, this can’t be undone. It can be helpful to create a new “test” book to test deleting.
 
-router.post('/:id', function (req, res, next) {
- Books.findByPk(req.params.id).then((book) => {
+router.post('/:id/delete', function (req, res, next) {
+ Books.findByPk(req.params.id)
+ .then( function(book){
+   console.log(book);
     return book.destroy();
-  }).then((apple) => {
-    console.log(apple)
+  }).then((book) => {
+    console.log(book);
     res.redirect('/');
+  }).catch(function(err){
+    res.send(500);
   });
 });
 
