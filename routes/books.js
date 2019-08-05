@@ -34,7 +34,7 @@ router.post('/new', (req, res, next) =>{
       // Render the same form and pass the error as a parameter
       res.render('new-book', {error:err.errors});
     } else {
-      throw err;
+      throw err
     }
   })
   .catch((err)=>{
@@ -72,11 +72,7 @@ router.post('/:id', function(req, res, next){
     } else{
       res.send(404);
     }
-  })
-  .then(function(){
-    res.redirect("/");    
-  })
-  .catch((err)=>{
+  }) .catch((err)=>{
     if(err.name === "SequelizeValidationError"){
            // Render the same form and pass the error as a parameter
            console.log(err);
@@ -84,6 +80,9 @@ router.post('/:id', function(req, res, next){
     } else {
       throw err;
     }
+  })
+  .then(function(){
+    res.redirect("/");    
   })
   .catch((err)=>{
     res.send(404)
@@ -93,19 +92,14 @@ router.post('/:id', function(req, res, next){
 
 //- Deletes a book. Careful, this can’t be undone. It can be helpful to create a new “test” book to test deleting.
 
-router.post('/:id/delete', (req, res, next)=>{
-  Books.findByPk(req.params.id)
-    .then((book)=>{
-      if(book){
-        book.destroy();
-      }
-      const error = new Error('Server Error.');
-      error.status = 500;
-      return next(error);
-    })
-    .then(()=>{ //redirect to the main page
-      res.redirect('/')
-    })
-})
+router.post('/:id', function (req, res, next) {
+ Books.findByPk(req.params.id).then((book) => {
+    return book.destroy();
+  }).then((apple) => {
+    console.log(apple)
+    res.redirect('/');
+  });
+});
+
 
 module.exports = router;
