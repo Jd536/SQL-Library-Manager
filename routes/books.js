@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
-
 var Books = require("../models").Books;
+const Op = Sequelize.Op;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -69,6 +69,8 @@ router.get('/:id', (req, res, next)=>{
 
 });
 
+
+
 //- UPDATES THE SELECTED BOOK ROW FROM THE BOOKS DATABASE
 router.post('/:id', function(req, res, next){
   Books.findByPk(req.params.id)
@@ -81,10 +83,14 @@ router.post('/:id', function(req, res, next){
   })
 });
 
+//  SEARCH FUNCTION BASED ON TITLE, GENRE, AUTHOR AND YEAR
+
+
 
 //- Deletes a book. Careful, this can’t be undone. It can be helpful to create a new “test” book to test deleting.
 
 router.post('/:id/delete', function (req, res, next) {
+  console.log('testing the delete request');
  Books.findByPk(req.params.id)
  .then( function(book){
    console.log(book);

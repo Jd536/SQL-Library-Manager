@@ -2,8 +2,14 @@ extends layout
 
 block content
   h1 Books
-  p
-    a.button(href='/books/new') Create New Book
+  .searchAndCreateNewBookContainer  
+    p
+      a.button(href='/books/new') Create New Book
+    form(method="" action="/books")
+      label(for='book-search')  Book Search: 
+      input#book-search(type='search')
+      button Search
+
   table
     thead
       tr
