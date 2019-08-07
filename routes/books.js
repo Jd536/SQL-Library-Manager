@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Books = require("../models").Books;
-const Op = Sequelize.Op;
+
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
